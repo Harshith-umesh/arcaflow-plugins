@@ -12,4 +12,4 @@ In order to run the [kube-burner plugin](kube-burner-plugin.py) run the followin
 2. Create a `venv` in the current directory with `python3 -m venv $(pwd)/venv`
 3. Activate the `venv` by running `source venv/bin/activate`
 4. Run `pip install -r requirements.txt`
-5. Run 
+5. Run `./kubeburner_plugin.py -f configs/indexer_example.yaml`

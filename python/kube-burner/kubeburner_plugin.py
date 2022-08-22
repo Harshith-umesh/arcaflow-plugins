@@ -15,7 +15,7 @@ class KubeBurnerIndexerInputParams:
     """
     This is the data structure for the input parameters for kube-burner indexer.
     """
-    collection_time: int = field(default=3,metadata={"name": "Time", "description": "Duration for which to collect the prometheus metrics"})
+    collection_time: int = field(metadata={"name": "Time", "description": "Duration for which to collect the prometheus metrics"})
     es_server: str = field(default="https://search-perfscale-dev-chmf5l4sh66lvxbnadi4bznl3a.us-west-2.es.amazonaws.com:443",metadata={"name": "Elasticsearch server url", "description": "URL for your elasticsearch endpoint"})
     es_index: str = field(default="ripsaw-kube-burner",metadata={"name": "Elasticsearch index name", "description": "Elasticsearch index to use for indexing the documents"})
 
