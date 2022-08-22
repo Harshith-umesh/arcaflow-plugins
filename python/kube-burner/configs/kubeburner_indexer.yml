@@ -1,0 +1,8 @@
+---
+global:
+  indexerConfig:
+    enabled: true
+    esServers: 
+    insecureSkipVerify: true
+    defaultIndex: 
+    type: elastic
