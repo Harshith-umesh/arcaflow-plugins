@@ -1,8 +1,12 @@
-# sysbench workload plugin for Arcaflow
+# Kube-burner workload plugin for Arcaflow
 
 arca-kube-burner is a workload plugin of the [kube-burner](https://github.com/cloud-bulldozer/kube-burner) benchmark tool
 using the [Arcaflow python SDK](https://github.com/arcalot/arcaflow-plugin-sdk-python).
 
+Kube-burner indexer is a tool which can collect prometheus metrics for a given time period. An elasticsearch server URL and index need to be provided to where the indexer will write the data to.
+Please refer to the [example config](configs/indexer_example.yml) to see the necessary input parameters. collection_time parameter defines the time duration for which to collect the prometheus metrics. 
+
+### Note: The plugin should be able to access the kubeconfig of your kubernetes/openshift cluster
 
 ## To test:
 
