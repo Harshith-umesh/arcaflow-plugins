@@ -87,8 +87,6 @@ def RunKubeBurnerIndexer(params: KubeBurnerIndexerInputParams ) -> typing.Tuple[
     with open('configs/kubeburner_indexer.yml', 'w') as yaml_file:
         yaml_file.write( yaml.dump(config, default_flow_style=False))
 
-
-
     uuid = uuidgen()
     prom_url , prom_token = getprometheuscreds()
 
@@ -105,12 +103,8 @@ def RunKubeBurnerIndexer(params: KubeBurnerIndexerInputParams ) -> typing.Tuple[
 
     output = process_out.decode("utf-8")
 
-
-    print("==>> Kube Burner Indexing complete!")
-    
+    print("==>> Kube Burner Indexing complete!")    
     return "success", KubeBurnerIndexerOutput(uuid,output)
-    
-
 
 
 if __name__ == "__main__":
