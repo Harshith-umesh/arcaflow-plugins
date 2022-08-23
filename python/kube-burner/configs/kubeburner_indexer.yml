@@ -2,7 +2,7 @@
 global:
   indexerConfig:
     enabled: true
-    esServers: 
+    esServers: []
     insecureSkipVerify: true
     defaultIndex: 
     type: elastic

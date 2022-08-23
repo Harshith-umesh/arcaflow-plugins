@@ -8,6 +8,7 @@ from typing import List,Dict
 from arcaflow_plugin_sdk import plugin,schema
 import subprocess
 import datetime
+import yaml
 
 
 @dataclass
@@ -41,6 +42,25 @@ class WorkloadError:
 kube_burner_indexer_input_schema = plugin.build_object_schema(KubeBurnerIndexerInputParams)
 kube_burner_indexer_output_schema = plugin.build_object_schema(KubeBurnerIndexerOutput)
 
+def uuidgen():
+    cmd="uuidgen"
+    uuid = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
+    uuid = uuid.decode("utf-8")
+    uuid=uuid.strip()
+    return uuid
+
+def getprometheuscreds():
+    cmd='oc get route -n openshift-monitoring prometheus-k8s -o jsonpath="{.spec.host}"'
+    prom_url= subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
+    prom_url = prom_url.decode("utf-8")
+    prom_url="https://"+prom_url
+
+    cmd='oc -n openshift-monitoring sa get-token prometheus-k8s'
+    prom_token= subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
+    prom_token = prom_token.decode("utf-8")
+
+    return prom_url,prom_token
+
 
 @plugin.step(
     id="kubeburnerindexer",
@@ -52,32 +72,34 @@ def RunKubeBurnerIndexer(params: KubeBurnerIndexerInputParams ) -> typing.Tuple[
 
     print("==>> Running Kube Burner Indexer to collect metrics over the last {} minutes ...".format(params.collection_time))
     
-    cmd="uuidgen"
-    uuid = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
-    uuid = uuid.decode("utf-8")
-    print(uuid)
+    try:
+        with open("configs/kubeburner_indexer.yml", "r") as input:
+            try:
+                config = yaml.safe_load(input)
+            except yaml.YAMLError as error:
+                return "error", WorkloadError(f"{error} reading kubeburner_indexer.yml")
+    except EnvironmentError as error:
+            return "error", WorkloadError(f"{error} while trying to open kubeburner_indexer.yml")
 
-    cmd='oc get route -n openshift-monitoring prometheus-k8s -o jsonpath="{.spec.host}"'
-    prom_url= subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
-    prom_url = prom_url.decode("utf-8")
-    prom_url="https://"+prom_url
-    print(prom_url)
+    config['global']['indexerConfig']['esServers'].append(params.es_server) 
+    config['global']['indexerConfig']['defaultIndex'] = params.es_index
 
-    cmd='oc -n openshift-monitoring sa get-token prometheus-k8s'
-    prom_token= subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
-    prom_token = prom_token.decode("utf-8")
-    print(prom_token)
+    with open('configs/kubeburner_indexer.yml', 'w') as yaml_file:
+        yaml_file.write( yaml.dump(config, default_flow_style=False))
+
+
+
+    uuid = uuidgen()
+    prom_url , prom_token = getprometheuscreds()
 
     current_time = datetime.datetime.now() 
     time_duration = current_time - datetime.timedelta(minutes=params.collection_time)
-    start_ts = int(time_duration.timestamp())  
-    current_ts= int(datetime.datetime.now().timestamp())
-    print(current_ts,start_ts)
-
+    start_ts = str(int(time_duration.timestamp()))
+    current_ts= str(int(datetime.datetime.now().timestamp()))
 
     try:
-        cmd=['./kube-burner', 'index', '-c','configs/kubeburner_indexer.yml', '--uuid='+str(uuid), '-u='+str(prom_url), '--job-name', 'kube-burner-indexer', '--token='+str(prom_token), '-m=configs/metrics.yml', '--start',start_ts, '--end', current_ts]
-        process_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
+        cmd=['./kube-burner', 'index', '-c','configs/kubeburner_indexer.yml', '--uuid='+str(uuid), '-u='+str(prom_url), '--job-name', 'kube-burner-indexer', '--token='+str(prom_token), '-m=configs/metrics.yaml', '--start',start_ts, '--end', current_ts]
+        process_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as error:
         return "error", WorkloadError(error.returncode,"{} failed with return code {}:\n{}".format(error.cmd[0],error.returncode,error.output))
 
