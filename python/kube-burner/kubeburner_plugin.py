@@ -19,7 +19,7 @@ class KubeBurnerIndexerInputParams:
     collection_time: int = field(metadata={"name": "Time", "description": "Duration for which to collect the prometheus metrics"})
     es_server: str = field(default="https://search-perfscale-dev-chmf5l4sh66lvxbnadi4bznl3a.us-west-2.es.amazonaws.com:443",metadata={"name": "Elasticsearch server url", "description": "URL for your elasticsearch endpoint"})
     es_index: str = field(default="ripsaw-kube-burner",metadata={"name": "Elasticsearch index name", "description": "Elasticsearch index to use for indexing the documents"})
-
+    job_name: str = field(default="kube-burner-indexer",metadata={"name": "Indexer job name", "description": "Name of the job for which metrics are being indexed"})
 @dataclass
 class KubeBurnerIndexerOutput:
     """
@@ -49,7 +49,7 @@ def uuidgen():
     uuid=uuid.strip()
     return uuid
 
-def getprometheuscreds():
+def get_prometheus_creds():
     cmd='oc get route -n openshift-monitoring prometheus-k8s -o jsonpath="{.spec.host}"'
     prom_url= subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
     prom_url = prom_url.decode("utf-8")
@@ -88,7 +88,7 @@ def RunKubeBurnerIndexer(params: KubeBurnerIndexerInputParams ) -> typing.Tuple[
         yaml_file.write( yaml.dump(config, default_flow_style=False))
 
     uuid = uuidgen()
-    prom_url , prom_token = getprometheuscreds()
+    prom_url , prom_token = get_prometheus_creds()
 
     current_time = datetime.datetime.now() 
     time_duration = current_time - datetime.timedelta(minutes=params.collection_time)
@@ -96,14 +96,14 @@ def RunKubeBurnerIndexer(params: KubeBurnerIndexerInputParams ) -> typing.Tuple[
     current_ts= str(int(datetime.datetime.now().timestamp()))
 
     try:
-        cmd=['./kube-burner', 'index', '-c','configs/kubeburner_indexer.yml', '--uuid='+str(uuid), '-u='+str(prom_url), '--job-name', 'kube-burner-indexer', '--token='+str(prom_token), '-m=configs/metrics.yaml', '--start',start_ts, '--end', current_ts]
+        cmd=['./kube-burner', 'index', '-c','configs/kubeburner_indexer.yml', '--uuid='+str(uuid), '-u='+str(prom_url), '--job-name', params.job_name, '--token='+str(prom_token), '-m=configs/metrics.yaml', '--start',start_ts, '--end', current_ts]
         process_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as error:
         return "error", WorkloadError(error.returncode,"{} failed with return code {}:\n{}".format(error.cmd[0],error.returncode,error.output))
 
     output = process_out.decode("utf-8")
 
-    print("==>> Kube Burner Indexing complete!")    
+    print("==>> Kube Burner Indexing complete! Metrics stored at elasticsearch server {} on index {} with UUID {} and jobName: {}".format(params.es_server,params.es_index,uuid,params.job_name))    
     return "success", KubeBurnerIndexerOutput(uuid,output)
 
 
