@@ -53,7 +53,6 @@ class KubeBurnerPodDensityInputParams(KubeBurnerCommonInputParams):
     This is the data structure for the input parameters for kube-burner pod density workload.
     """
 
-    #pod_density_params: KubeBurnerCommonInputParams
     podReadyThreshold: str = field(default="5000ms",metadata={"name": "POD_READY_THRESHOLD", "description": "Pod ready latency threshold (only applies to node-density and pod-density workloads)."})
    
 
@@ -63,8 +62,6 @@ class KubeBurnerClusterDensityInputParams(KubeBurnerCommonInputParams):
     """
     This is the data structure for the input parameters for kube-burner cluster density workload.
     """
-
-    #cluster_density_params: KubeBurnerCommonInputParams   
 
 
 @dataclass
