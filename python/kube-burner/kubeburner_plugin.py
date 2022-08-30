@@ -193,5 +193,6 @@ def RunKubeBurnerPodDensity(params: KubeBurnerPodDensityInputParams ) -> typing.
 
 if __name__ == "__main__":
     sys.exit(plugin.run(plugin.build_schema(
-        RunKubeBurnerIndexer
+        RunKubeBurnerIndexer,
+        RunKubeBurnerPodDensity
     )))
