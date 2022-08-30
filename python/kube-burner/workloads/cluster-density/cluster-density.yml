@@ -1,0 +1,63 @@
+---
+global:
+  writeToFile: false
+  indexerConfig:
+    enabled: 
+    esServers: []
+    insecureSkipVerify: true
+    defaultIndex: 
+    type: elastic
+  measurements:
+    - name: podLatency
+      esIndex: 
+jobs:
+  - name: cluster-density
+    jobIterations: 
+    qps: 
+    burst: 
+    namespacedIterations: true
+    namespace: 
+    podWait: 
+    cleanup: 
+    waitFor: 
+    waitWhenFinished: 
+    verifyObjects: 
+    errorOnVerify: 
+    maxWaitTimeout: 
+    preLoadImages: 
+    preLoadPeriod: 
+    objects:
+
+      - objectTemplate: workloads/cluster-density/imagestream.yml
+        replicas: 1
+        inputVars:
+          prefix: cluster-density
+
+      - objectTemplate: workloads/cluster-density/build.yml
+        replicas: 1
+        inputVars:
+          prefix: cluster-density
+          nodeSelector: 
+
+      - objectTemplate: workloads/cluster-density/deployment.yml
+        replicas: 5
+        inputVars:
+          podReplicas: 2
+          name: cluster-density
+          nodeSelector: 
+
+      - objectTemplate: workloads/cluster-density/service.yml
+        replicas: 5
+        inputVars:
+          name: cluster-density
+        
+      - objectTemplate: workloads/cluster-density/route.yml
+        replicas: 1
+        inputVars:
+          name: cluster-density
+
+      - objectTemplate: workloads/cluster-density/secret.yml
+        replicas: 10
+
+      - objectTemplate: workloads/cluster-density/configmap.yml
+        replicas: 10

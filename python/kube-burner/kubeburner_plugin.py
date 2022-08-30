@@ -23,9 +23,9 @@ class KubeBurnerIndexerInputParams:
 
 
 @dataclass
-class KubeBurnerPodDensityInputParams:
+class KubeBurnerCommonInputParams:
     """
-    This is the data structure for the input parameters for kube-burner pod density workload.
+    This is the data structure for the common input parameters for kube-burner workloads.
     """
     waitFor: typing.List[str]
     indexing: bool = field(default="true",metadata={"name": "INDEXING", "description": "Enable/disable indexing"})
@@ -45,7 +45,26 @@ class KubeBurnerPodDensityInputParams:
     podNodeSelector: str = field(default="{node-role.kubernetes.io/worker: }",metadata={"name": "POD_NODE_SELECTOR", "description": "nodeSelector for pods created by the kube-burner workloads"})
     podReadyThreshold: str = field(default="5000ms",metadata={"name": "POD_READY_THRESHOLD", "description": "Pod ready latency threshold (only applies to node-density and pod-density workloads)."})
     namespacedIterations: bool = field(default="false",metadata={"name": "NameSpacedIterations", "description": "Number of namespace iterations"})
-    
+
+
+@dataclass
+class KubeBurnerPodDensityInputParams:
+    """
+    This is the data structure for the input parameters for kube-burner pod density workload.
+    """
+
+    pod_density_params: KubeBurnerCommonInputParams
+    podReadyThreshold: str = field(default="5000ms",metadata={"name": "POD_READY_THRESHOLD", "description": "Pod ready latency threshold (only applies to node-density and pod-density workloads)."})
+   
+
+
+@dataclass
+class KubeBurnerClusterDensityInputParams:
+    """
+    This is the data structure for the input parameters for kube-burner cluster density workload.
+    """
+
+    cluster_density_params: KubeBurnerCommonInputParams   
 
 
 @dataclass
@@ -69,6 +88,7 @@ class WorkloadError:
 
 kube_burner_indexer_input_schema = plugin.build_object_schema(KubeBurnerIndexerInputParams)
 kube_burner_pod_density_input_schema = plugin.build_object_schema(KubeBurnerPodDensityInputParams)
+kube_burner_cluster_density_input_schema = plugin.build_object_schema(KubeBurnerPodDensityInputParams)
 kube_burner_output_schema = plugin.build_object_schema(KubeBurnerOutput)
 
 def uuidgen():
@@ -93,7 +113,7 @@ def get_prometheus_creds():
 
 
 @plugin.step(
-    id="kubeburnerindexer",
+    id="indexer",
     name="Kube-Burner Indexer Workload",
     description="Collect and index Prometheus metrics for a specified time period",
     outputs={"success": KubeBurnerOutput, "error": WorkloadError},
@@ -137,7 +157,7 @@ def RunKubeBurnerIndexer(params: KubeBurnerIndexerInputParams ) -> typing.Tuple[
     return "success", KubeBurnerOutput(uuid,output)
 
 @plugin.step(
-    id="kubeburnerpoddensity",
+    id="poddensity",
     name="Kube-Burner Pod Density Workload",
     description="Kube-burner Workload which stresses the cluster by creating sleep pods",
     outputs={"success": KubeBurnerOutput, "error": WorkloadError},
@@ -193,8 +213,66 @@ def RunKubeBurnerPodDensity(params: KubeBurnerPodDensityInputParams ) -> typing.
     print("==>> Kube Burner Pod Density Workload complete!")    
     return "success", KubeBurnerOutput(uuid,output)
 
+@plugin.step(
+    id="clusterdensity",
+    name="Kube-Burner Cluster Density Workload",
+    description="Kube-burner Workload which stresses the cluster by creating different resources",
+    outputs={"success": KubeBurnerOutput, "error": WorkloadError},
+)
+def RunKubeBurnerClusterDensity(params: KubeBurnerClusterDensityInputParams ) -> typing.Tuple[str, typing.Union[KubeBurnerOutput, WorkloadError]]:
+
+    print("==>> Running Kube Burner Cluster Density Workload ...")
+    
+    uuid = uuidgen()
+    prom_url , prom_token = get_prometheus_creds()
+
+    try:
+        with open("workloads/cluster-density/cluster-density.yml", "r") as input:
+            try:
+                config = yaml.safe_load(input)
+            except yaml.YAMLError as error:
+                return "error", WorkloadError(f"{error} reading cluster_density.yml")
+    except EnvironmentError as error:
+            return "error", WorkloadError(f"{error} while trying to open cluster_density.yml")
+
+    config['global']['indexerConfig']['esServers'].append(params.es_server) 
+    config['global']['indexerConfig']['defaultIndex'] = params.es_index
+    config['global']['indexerConfig']['enabled'] = params.indexing
+    config['global']['measurements'][0]['esIndex'] = params.es_index
+    config['jobs'][0]['jobIterations'] = params.jobIterations
+    config['jobs'][0]['qps'] = params.qps
+    config['jobs'][0]['burst'] = params.burst
+    config['jobs'][0]['namespacedIterations'] = params.namespacedIterations
+    config['jobs'][0]['namespace'] = uuid
+    config['jobs'][0]['podWait'] = params.podWait
+    config['jobs'][0]['cleanup'] = params.cleanup
+    config['jobs'][0]['waitFor'] = params.waitFor
+    config['jobs'][0]['waitWhenFinished'] = params.waitWhenFinished
+    config['jobs'][0]['verifyObjects'] = params.verifyObjects
+    config['jobs'][0]['errorOnVerify'] = params.errorOnVerify
+    config['jobs'][0]['maxWaitTimeout'] = params.maxWaitTimeout
+    config['jobs'][0]['preLoadImages'] = params.preLoadImages
+    config['jobs'][0]['preLoadPeriod'] = params.preLoadPeriod
+    config['jobs'][0]['objects'][1]['inputVars']['nodeSelector'] = params.podNodeSelector
+    config['jobs'][0]['objects'][2]['inputVars']['nodeSelector'] = params.podNodeSelector
+
+    with open('workloads/cluster-density/cluster-density-config.yml', 'w') as yaml_file:
+        yaml_file.write( yaml.dump(config, default_flow_style=False))
+
+    try:
+        cmd=['./kube-burner', 'init', '-c','workloads/cluster-density/cluster-density-config.yml', '--uuid='+str(uuid), '-u='+str(prom_url),  '--token='+str(prom_token), '-m=metrics_profiles/metrics.yaml']
+        process_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as error:
+        return "error", WorkloadError(error.returncode,"{} failed with return code {}:\n{}".format(error.cmd[0],error.returncode,error.output))
+
+    output = process_out.decode("utf-8")
+
+    print("==>> Kube Burner Cluster Density Workload complete!")    
+    return "success", KubeBurnerOutput(uuid,output)
+
 if __name__ == "__main__":
     sys.exit(plugin.run(plugin.build_schema(
         RunKubeBurnerIndexer,
-        RunKubeBurnerPodDensity
+        RunKubeBurnerPodDensity,
+        RunKubeBurnerClusterDensity
     )))

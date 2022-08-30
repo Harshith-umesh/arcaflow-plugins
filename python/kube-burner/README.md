@@ -7,7 +7,7 @@ Kube-burner indexer is a tool which can collect prometheus metrics for a given t
 Which metrics to collect is defined in the [metrics config file](configs/metrics.yaml).
 Please refer to the [example config](configs/indexer_example.yml) to see the necessary input parameters. collection_time parameter defines the time duration for which to collect the prometheus metrics. 
 
-### Note: The plugin should be able to access the kubeconfig of your kubernetes/openshift cluster
+### Note: The plugin should be able to access the kubeconfig of your kubernetes/openshift cluster and kube-burner binary must be downloaded locally.
 
 ## To test:
 
