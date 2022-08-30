@@ -1,0 +1,40 @@
+---
+global:
+  writeToFile: false
+  indexerConfig:
+    enabled: 
+    esServers: []
+    insecureSkipVerify: true
+    defaultIndex: 
+    type: elastic
+  measurements:
+    - name: podLatency
+      esIndex: 
+      thresholds:
+        - conditionType: Ready
+          metric: P99
+          threshold: 
+
+jobs:
+  - name: pod-density
+    jobIterations: 
+    qps: 
+    burst: 
+    namespacedIterations: false
+    namespace: 
+    podWait: 
+    cleanup: 
+    waitFor: 
+    waitWhenFinished: 
+    verifyObjects: 
+    errorOnVerify: 
+    maxWaitTimeout: 
+    preLoadImages: 
+    preLoadPeriod: 
+    objects:
+
+      - objectTemplate: pod.yml
+        replicas: 1
+        inputVars:
+          containerImage: gcr.io/google_containers/pause:3.1
+          nodeSelector: 
