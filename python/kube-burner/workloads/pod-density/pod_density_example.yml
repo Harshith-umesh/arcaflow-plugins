@@ -5,7 +5,6 @@ jobIterations: 2
 qps: 20
 burst: 20
 namespacedIterations: false
-namespace: kube
 podWait: false
 cleanup: true
 waitFor: []
@@ -13,7 +12,7 @@ waitWhenFinished: true
 verifyObjects: true
 errorOnVerify: true
 maxWaitTimeout: 1h
-preLoadImages: true	
+preLoadImages: true
 preLoadPeriod: 2m
 podReadyThreshold: 5000ms
 podNodeSelector: "{node-role.kubernetes.io/worker: }"

@@ -27,17 +27,15 @@ class KubeBurnerPodDensityInputParams:
     """
     This is the data structure for the input parameters for kube-burner pod density workload.
     """
+    waitFor: typing.List[str]
     indexing: bool = field(default="true",metadata={"name": "INDEXING", "description": "Enable/disable indexing"})
     es_server: str = field(default="https://search-perfscale-dev-chmf5l4sh66lvxbnadi4bznl3a.us-west-2.es.amazonaws.com:443",metadata={"name": "Elasticsearch server url", "description": "URL for your elasticsearch endpoint"})
     es_index: str = field(default="ripsaw-kube-burner",metadata={"name": "Elasticsearch index name", "description": "Elasticsearch index to use for indexing the documents"})
     jobIterations: int = field(default="1000",metadata={"name": "TEST_JOB_ITERATIONS", "description": "This variable configures the number of pod-density jobs iterations to perform"})
     qps: int = field(default="20",metadata={"name": "QPS", "description": "Queries/sec"})
     burst: int = field(default="20",metadata={"name": "BURST", "description": "Maximum number of simultaneous queries"})
-    namespacedIterations: str = "false"
-    namespace: str = field(metadata={"name": "Namespace", "description": "Namespace created and used for running this workload"})
     podWait: bool = field(default="false",metadata={"name": "POD_WAIT", "description": "Wait for pods to be ready in each iteration"})
     cleanup: bool = field(default="true",metadata={"name": "CLEANUP", "description": "Delete old namespaces for the selected workload before starting benchmark"})
-    waitFor: list = []
     waitWhenFinished: bool = field(default="true",metadata={"name": "WAIT_WHEN_FINISHED", "description": "Wait after benchmark finishes"})
     verifyObjects: bool = field(default="true",metadata={"name": "VERIFY_OBJECTS", "description": "Verify objects created by kube-burner"})
     errorOnVerify: bool = field(default="true",metadata={"name": "ERROR_ON_VERIFY", "description": "Make kube-burner pod to hang when verification fails"})
@@ -46,6 +44,9 @@ class KubeBurnerPodDensityInputParams:
     preLoadPeriod: str = field(default="2m",metadata={"name": "PRELOAD_PERIOD", "description": "How long the preload stage will last"})
     podNodeSelector: str = field(default="{node-role.kubernetes.io/worker: }",metadata={"name": "POD_NODE_SELECTOR", "description": "nodeSelector for pods created by the kube-burner workloads"})
     podReadyThreshold: str = field(default="5000ms",metadata={"name": "POD_READY_THRESHOLD", "description": "Pod ready latency threshold (only applies to node-density and pod-density workloads)."})
+    namespacedIterations: bool = field(default="false",metadata={"name": "NameSpacedIterations", "description": "Number of namespace iterations"})
+    
+
 
 @dataclass
 class KubeBurnerOutput:
@@ -81,6 +82,7 @@ def get_prometheus_creds():
     cmd=['oc', 'get', 'route', '-n', 'openshift-monitoring', 'prometheus-k8s', '-o', 'jsonpath="{.spec.host}"' ]
     prom_url= subprocess.check_output(cmd, stderr=subprocess.STDOUT)
     prom_url = prom_url.decode("utf-8")
+    prom_url = prom_url.strip('\"')
     prom_url="https://"+prom_url
 
     cmd=['oc', '-n', 'openshift-monitoring', 'sa', 'get-token', 'prometheus-k8s']
@@ -165,7 +167,7 @@ def RunKubeBurnerPodDensity(params: KubeBurnerPodDensityInputParams ) -> typing.
     config['jobs'][0]['qps'] = params.qps
     config['jobs'][0]['burst'] = params.burst
     config['jobs'][0]['namespacedIterations'] = params.namespacedIterations
-    config['jobs'][0]['namespace'] = params.namespace
+    config['jobs'][0]['namespace'] = uuid
     config['jobs'][0]['podWait'] = params.podWait
     config['jobs'][0]['cleanup'] = params.cleanup
     config['jobs'][0]['waitFor'] = params.waitFor

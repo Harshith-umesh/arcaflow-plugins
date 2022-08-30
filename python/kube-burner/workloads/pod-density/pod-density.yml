@@ -33,7 +33,7 @@ jobs:
     preLoadPeriod: 
     objects:
 
-      - objectTemplate: pod.yml
+      - objectTemplate: workloads/pod-density/pod.yml
         replicas: 1
         inputVars:
           containerImage: gcr.io/google_containers/pause:3.1
