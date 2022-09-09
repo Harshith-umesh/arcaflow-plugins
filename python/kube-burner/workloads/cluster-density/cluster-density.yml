@@ -1,6 +1,6 @@
 ---
 global:
-  writeToFile: false
+  writeToFile: 
   indexerConfig:
     enabled: 
     esServers: []

@@ -19,6 +19,9 @@ In order to run the [kube-burner plugin](kube-burner-plugin.py) run the followin
 2. Create a `venv` in the current directory with `python3 -m venv $(pwd)/venv`
 3. Activate the `venv` by running `source venv/bin/activate`
 4. Run `pip install -r requirements.txt`
-5. To run kube-burner indexer `./kubeburner_plugin.py -f workloads/indexer_example.yaml -s indexer`
+5. To run kube-burner indexer `./kubeburner_plugin.py -f workloads/indexer/indexer_example.yml -s indexer`
 6. To run kube-burner pod-density workload `./kubeburner_plugin.py -f workloads/pod-density/pod_density_example.yml -s poddensity`
 7. To run kube-burner cluster-density workload `./kubeburner_plugin.py -f workloads/cluster-density/cluster_density_example.yml -s clusterdensity`
+8. To run kube-burner node-density workload `./kubeburner_plugin.py -f workloads/node-density/node_density_example.yml -s nodedensity`
+9. To run kube-burner node-density-heavy workload `./kubeburner_plugin.py -f workloads/node-density-heavy/node_density_heavy_example.yml -s nodedensityheavy`
+10. To run kube-burner node-density-cni workload `./kubeburner_plugin.py -f workloads/node-density-cni/node_density_cni_example.yml -s nodedensitycni`

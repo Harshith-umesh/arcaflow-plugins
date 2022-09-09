@@ -2,3 +2,4 @@ collection_time: 10
 es_server: 'https://search-perfscale-dev-chmf5l4sh66lvxbnadi4bznl3a.us-west-2.es.amazonaws.com:443'
 es_index: 'ripsaw-kube-burner'
 job_name: 'job1-index'
+writeToFile: false

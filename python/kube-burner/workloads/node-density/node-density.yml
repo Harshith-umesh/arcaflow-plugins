@@ -16,7 +16,7 @@ global:
           threshold: 
 
 jobs:
-  - name: pod-density
+  - name: node-density
     jobIterations: 
     qps: 
     burst: 
@@ -33,7 +33,7 @@ jobs:
     preLoadPeriod: 
     objects:
 
-      - objectTemplate: workloads/pod-density/pod.yml
+      - objectTemplate: workloads/node-density/pod.yml
         replicas: 1
         inputVars:
           containerImage: gcr.io/google_containers/pause:3.1

@@ -2,7 +2,6 @@ indexing: true
 writeToFile: false
 es_server: 'https://search-perfscale-dev-chmf5l4sh66lvxbnadi4bznl3a.us-west-2.es.amazonaws.com:443'
 es_index: 'ripsaw-kube-burner'
-jobIterations: 2
 qps: 20
 burst: 20
 namespacedIterations: false
@@ -16,5 +15,6 @@ maxWaitTimeout: 1h
 preLoadImages: true
 preLoadPeriod: 2m
 podReadyThreshold: 5000ms
-podNodeSelector: "{node-role.kubernetes.io/worker: }"
+NODE_COUNT: 2
+PODS_PER_NODE: 30
 
