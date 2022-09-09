@@ -82,9 +82,6 @@ class KubeBurnerNodeDensityInputParams(KubeBurnerCommonInputParams, KubeBurnerCo
     This is the data structure for the input parameters for kube-burner node-density workload.
     """
 
-    #NODE_COUNT: int = field(metadata={"name": "NODE_COUNT", "description": "Number of worker nodes to deploy the pods on"})
-    #PODS_PER_NODE: int = field(default="245",metadata={"name": "PODS_PER_NODE", "description": "the maximum number of pods to deploy on each labeled node."})
-   
 
 @dataclass
 class KubeBurnerNodeDensityHeavyInputParams(KubeBurnerCommonInputParams, KubeBurnerCommonNodeDensityInputParams):
@@ -92,9 +89,6 @@ class KubeBurnerNodeDensityHeavyInputParams(KubeBurnerCommonInputParams, KubeBur
     This is the data structure for the input parameters for kube-burner node-density-heavy density workload.
     """
 
-    #NODE_COUNT: int = field(metadata={"name": "NODE_COUNT", "description": "Number of worker nodes to deploy the pods on"})
-    #PODS_PER_NODE: int = field(default="245",metadata={"name": "PODS_PER_NODE", "description": "the maximum number of pods to deploy on each labeled node."})
-   
 
 @dataclass
 class KubeBurnerNodeDensityCniInputParams(KubeBurnerCommonInputParams, KubeBurnerCommonNodeDensityInputParams):
@@ -102,9 +96,6 @@ class KubeBurnerNodeDensityCniInputParams(KubeBurnerCommonInputParams, KubeBurne
     This is the data structure for the input parameters for kube-burner node-density-cni density workload.
     """
 
-    #NODE_COUNT: int = field(metadata={"name": "NODE_COUNT", "description": "Number of worker nodes to deploy the pods on"})
-    #PODS_PER_NODE: int = field(default="245",metadata={"name": "PODS_PER_NODE", "description": "the maximum number of pods to deploy on each labeled node."})
-   
 
 @dataclass
 class KubeBurnerOutput:
