@@ -278,7 +278,6 @@ def RunKubeBurnerNodeDensityHeavy(params: KubeBurnerNodeDensityHeavyInputParams 
     config['global']['indexerConfig']['defaultIndex'] = params.es_index
     config['global']['indexerConfig']['enabled'] = params.indexing
     config['global']['measurements'][0]['esIndex'] = params.es_index
-    config['global']['measurements'][0]['thresholds'][0]['threshold'] = params.podReadyThreshold
     config['jobs'][0]['jobIterations'] = TEST_JOB_ITERATIONS
     config['jobs'][0]['qps'] = params.qps
     config['jobs'][0]['burst'] = params.burst
@@ -344,7 +343,6 @@ def RunKubeBurnerNodeDensityCni(params: KubeBurnerNodeDensityCniInputParams ) ->
     config['global']['indexerConfig']['defaultIndex'] = params.es_index
     config['global']['indexerConfig']['enabled'] = params.indexing
     config['global']['measurements'][0]['esIndex'] = params.es_index
-    config['global']['measurements'][0]['thresholds'][0]['threshold'] = params.podReadyThreshold
     config['jobs'][0]['jobIterations'] = TEST_JOB_ITERATIONS
     config['jobs'][0]['qps'] = params.qps
     config['jobs'][0]['burst'] = params.burst

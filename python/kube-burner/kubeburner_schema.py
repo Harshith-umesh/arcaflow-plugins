@@ -77,7 +77,7 @@ class KubeBurnerCommonNodeDensityInputParams():
    
 
 @dataclass
-class KubeBurnerNodeDensityInputParams(KubeBurnerCommonNodeDensityInputParams, KubeBurnerCommonInputParams):
+class KubeBurnerNodeDensityInputParams(KubeBurnerCommonInputParams, KubeBurnerCommonNodeDensityInputParams):
     """
     This is the data structure for the input parameters for kube-burner node-density workload.
     """
@@ -87,7 +87,7 @@ class KubeBurnerNodeDensityInputParams(KubeBurnerCommonNodeDensityInputParams, K
    
 
 @dataclass
-class KubeBurnerNodeDensityHeavyInputParams(KubeBurnerCommonNodeDensityInputParams, KubeBurnerCommonInputParams):
+class KubeBurnerNodeDensityHeavyInputParams(KubeBurnerCommonInputParams, KubeBurnerCommonNodeDensityInputParams):
     """
     This is the data structure for the input parameters for kube-burner node-density-heavy density workload.
     """
@@ -97,7 +97,7 @@ class KubeBurnerNodeDensityHeavyInputParams(KubeBurnerCommonNodeDensityInputPara
    
 
 @dataclass
-class KubeBurnerNodeDensityCniInputParams(KubeBurnerCommonNodeDensityInputParams, KubeBurnerCommonInputParams):
+class KubeBurnerNodeDensityCniInputParams(KubeBurnerCommonInputParams, KubeBurnerCommonNodeDensityInputParams):
     """
     This is the data structure for the input parameters for kube-burner node-density-cni density workload.
     """
