@@ -26,7 +26,7 @@ class KubeBurnerCommonInputParams:
     """
     This is the data structure for the common input parameters for kube-burner workloads.
     """
-    waitFor: typing.List[str] = field(default=[],metadata={"name": "Wait for ", "desscription":"Wait for the resources of this list to be ready"})
+    waitFor: typing.List[str] = field(default_factory=list,metadata={"name": "Wait for ", "desscription":"Wait for the resources of this list to be ready"})
     writeToFile: bool = field(default="false",metadata={"name": "Write to file", "desscription": "Whether to dump collected metrics to files locally"})
     indexing: bool = field(default="true",metadata={"name": "INDEXING", "description": "Enable/disable indexing"})
     es_server: str = field(default="https://search-perfscale-dev-chmf5l4sh66lvxbnadi4bznl3a.us-west-2.es.amazonaws.com:443",metadata={"name": "Elasticsearch server url", "description": "URL for your elasticsearch endpoint"})
