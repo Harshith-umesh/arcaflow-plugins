@@ -32,19 +32,22 @@ class IndexerConfig:
             "description": "Default index to send the prometheus metrics into",
         }
     )
-    port: int = field(
+    port: Optional[int] = field(
+        default=None,
         metadata={
             "name": "Port",
             "description": "indexer port",
         }
     )
     insecureSkipVerify: bool = field(
+        default=False,
         metadata={
             "name": "InsecureSkipVerify",
             "description": "TLS certificate verification",
         }
     )
     enabled: bool = field(
+        default=False,
         metadata={
             "name": "Enabled",
             "description": "Enable indexing",
@@ -82,6 +85,7 @@ class Measurements:
         }
     )
     thresholds: Optional[LatencyThreshold]  = field(
+        default=None,
         metadata={
             "name": "LatencyThreshold",
             "description": "Holds the thresholds configuration",
@@ -97,6 +101,7 @@ class Measurements:
 @dataclass
 class GlobalConfig:
     writeToFile: bool = field(
+        default=False,
         metadata={
             "name": "WriteToFile",
             "description": "Whether to dump collected metrics to files",
@@ -109,24 +114,28 @@ class GlobalConfig:
         }
     )
     measurements: Optional[List[Measurements]] = field(
+        default= None,
         metadata={
             "name": "Measurements",
             "description": "List of measurements",
         }
     )
     metricsDirectory: Optional[str] = field(
+        default= None,
         metadata={
             "name": "MetricsDirectory",
             "description": "Directory where collected metrics will be dumped into. It will be created if it doesn't exist previously",
         }
     )
     createTarball: Optional[bool] = field(
+        default= False,
         metadata={
             "name": "CreateTarball",
             "description": "Create metrics tarball, it has no effect if writeToFile is not enabled",
         }
     )
     requestTimeout: Optional[str] = field(
+        default= "15s",
         metadata={
             "name": "RequestTimeout",
             "description": "Client-go request timeout",
@@ -149,36 +158,42 @@ class Object:
         }
     )
     kind: Optional[str] = field(
+        default=None,
         metadata={
             "name": "Kind",
             "description": "object kind to delete",
         }
     )
     patchType: Optional[str] = field(
+        default=None,
         metadata={
             "name": "PatchType",
             "description": "type of patch mode",
         }
     )
     apiVersion: Optional[str] = field(
+        default=None,
         metadata={
             "name": "ApiVersion",
             "description": "apiVersion of the object to remove",
         }
     )
     namespaced: Optional[bool] = field(
+        default=None,
         metadata={
             "name": "Namespaced",
             "description": "namespaced",
         }
     )
     inputVars: Optional[Dict[str,schema.ANY_TYPE]] = field(
+        default=None,
         metadata={
             "name": "InputVars",
             "description": "contains a map of arbitrary input variables that can be introduced by users",
         }
     )
     labelSelector: Optional[str] = field(
+        default=None,
         metadata={
             "name": "LabelSelector",
             "description": "objects with this labels will be removed",
@@ -195,12 +210,14 @@ class Job:
         }
     )
     jobIterationDelay: Optional[Annotated[int, schema.units(schema.UNIT_TIME)]] = field(
+        default='0s',
         metadata={
             "name": "JobIterationDelay",
             "description": "how much time to wait between each job iteration",
         }
     )
     jobPause: Optional[Annotated[int, schema.units(schema.UNIT_TIME)]] = field(
+        default='0s',
         metadata={
             "name": "JobPause",
             "description": "how much time to pause after finishing the job",
@@ -213,6 +230,7 @@ class Job:
         }
     )
     jobType: Optional[str] = field(
+        default=None,
         metadata={
             "name": "JobType",
             "description": "type of job",
@@ -249,6 +267,7 @@ class Job:
         }
     )
     waitForDeletion: bool = field(
+        default=False,
         metadata={
             "name": "WaitForDeletion",
             "description": "wait for objects to be definitively deleted",
@@ -326,6 +345,7 @@ class KubeBurnerInput:
         }
     )
     jobs: Optional[Job] = field(
+        default=None,
         metadata={
             "name": "Job",
             "description": "Kube-burner job configs",
